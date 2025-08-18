@@ -18,7 +18,8 @@ export default function ToolButton() {
         </Button>
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent 
+      <DropdownMenuContent
+        side="top" 
         align="start"   // căn theo bên trái của nút
         sideOffset={8}  // đẩy menu ra xa nút (theo chiều ngang)
         className="w-48"
@@ -34,5 +35,6 @@ export default function ToolButton() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
   )
 }

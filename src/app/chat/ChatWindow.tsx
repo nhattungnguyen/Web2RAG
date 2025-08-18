@@ -76,9 +76,7 @@ export default function ChatWindow(){
         {/* Thanh input giữa màn hình */}
         <div className="flex items-center w-full max-w-2xl bg-white border border-gray-300 
                         rounded-full shadow px-4 py-2 gap-2">
-          <button className="text-gray-400 hover:text-gray-600">
-            <Plus size={20} />
-          </button>
+          <ToolButton />
           {/* Ô input */}
           <Textarea
             rows={1}

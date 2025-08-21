@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -12,51 +12,11 @@ type CrawlMode = 'shallow' | 'standard' | 'deep';
 export default function UrlForm() {
   const [url, setUrl] = useState('');
   const [chatName, setChatName] = useState('');
-  const [mode, setMode] = useState<CrawlMode>('standard');   // preset depth
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string>('');
-
-  // Map preset -> depth (backend vẫn sẽ clamp theo CAP)
-  const depth = useMemo(() => {
-    if (mode === 'shallow') return 0;   // chỉ crawl URL gốc
-    if (mode === 'deep') return 2;      // cẩn trọng
-    return 1;                           // mặc định
-  }, [mode]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
-
-    try {
-      // Gửi cấu hình kèm job metadata
-      const res = await fetch('/api/start-job', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url,
-          chatName,
-          depth,
-        }),
-      });
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => '');
-        throw new Error(txt || 'Request failed');
-      }
-
-      const data = await res.json().catch(() => ({}));
-      setMessage(`✅ Job started: ${data.jobId ?? 'N/A'} (mode: ${mode}, depth=${depth})`);
-    } catch (err: any) {
-      setMessage(`❌ Failed to start job. ${err?.message ? 'Details: ' + err.message : ''}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [mode, setMode] = useState<CrawlMode>('standard');
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(e) => e.preventDefault()}
       className="flex flex-col gap-6 w-full max-w-lg mx-auto p-6 bg-white rounded-2xl shadow"
     >
       {/* Chat name */}
@@ -105,7 +65,7 @@ export default function UrlForm() {
               <RadioGroupItem value="shallow" id="mode-shallow" />
               <span className="font-medium">Shallow</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Chỉ trang hiện tại </p>
+            <p className="text-xs text-gray-500 mt-1">Chỉ trang hiện tại</p>
           </label>
 
           <label
@@ -131,24 +91,13 @@ export default function UrlForm() {
               <RadioGroupItem value="deep" id="mode-deep" />
               <span className="font-medium">Deep</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Chuyên sâu </p>
+            <p className="text-xs text-gray-500 mt-1">Chuyên sâu</p>
           </label>
         </RadioGroup>
       </div>
 
-
       {/* Submit */}
-      <Button type="submit" disabled={loading}>
-        {loading ? 'Đang gửi...' : 'Bắt đầu crawl'}
-      </Button>
-
-      {/* Result / Error */}
-      {message && (
-        <p className={cn('text-sm mt-1', message.startsWith('✅') ? 'text-emerald-600' : 'text-rose-600')}>
-          {message}
-        </p>
-      )}
+      <Button type="submit">Bắt đầu crawl</Button>
     </form>
   );
 }
-
